@@ -1,3 +1,14 @@
+/* ---------------------------------------------------------------------------
+** This software is in the public domain, furnished "as is", without technical
+** support, and with no warranty, express or implied, as to its usefulness for
+** any purpose.
+**
+** lcd.cpp
+** 
+** Interface to an LCD 16x2 though a MCP23008 GPIO expander 
+**
+** -------------------------------------------------------------------------*/
+
 #include <Arduino.h>
 #include "lcd.h"
 
@@ -32,7 +43,6 @@ int lcd::begin(uint8_t address, uint8_t sda, uint8_t scl)
 void lcd::write_4bits(uint8_t bits, bool mode)
 {
 	bits=bits & 0xf;
-	bits=bits << 3;
 	if (mode) 
 	{
 		bits=bits|LCD_RS;

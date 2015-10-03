@@ -10,6 +10,27 @@
 **
 ** -------------------------------------------------------------------------*/
 
+/* Wiring 
+#         LCD                |    MCP23008
+# 1 : GND
+# 2 : 3.3V
+# 3 : Contrast (0-5V)*
+# 4 : RS (Register Select) <-------- PIN5
+# 5 : R/W (Read Write)       - GROUND THIS PIN
+# 6 : Enable or Strobe     <-------- PIN6
+# 7 : Data Bit 0             - NOT USED
+# 8 : Data Bit 1             - NOT USED
+# 9 : Data Bit 2             - NOT USED
+# 10: Data Bit 3             - NOT USED
+# 11: Data Bit 4           <-------- PIN0
+# 12: Data Bit 5           <-------- PIN1
+# 13: Data Bit 6           <-------- PIN2
+# 14: Data Bit 7           <-------- PIN3
+# 15: LCD Backlight +5V**
+# 16: LCD Backlight GND
+*/
+
+
 #include <Wire.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
