@@ -30,7 +30,6 @@
 # 16: LCD Backlight GND
 */
 
-
 #include <Wire.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
@@ -38,6 +37,7 @@
 #include <EEPROM.h>
 
 #include "lcd.h"
+#include "ntp.h"
 
 MDNSResponder mdns;
 bool mdnsinit = false;
@@ -46,6 +46,18 @@ const char magic[] = {0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad
 int offsetSSID = sizeof(magic);
 int offsetPassword = 48;
 lcd disp;
+
+IPAddress timeServer(129, 6, 15, 28); // time.nist.gov NTP server
+ntpclient ntp(timeServer);
+
+String addDigits(byte digits)
+{  
+    String txt;
+    if(digits < 10)
+        txt += "0";
+    txt += digits;
+    return txt;
+}
 
 int initStaFromEEPROM()
 {
@@ -92,7 +104,7 @@ void setup()
     
     // init LCD
     disp.begin(0x00, 0, 2);
-    disp.print("Starting","");
+    disp.print("Init","");
     
     // init eeprom
     EEPROM.begin(512);
@@ -102,8 +114,8 @@ void setup()
     
     // setup AP
     WiFi.softAP("esp8266");
-    
-    // setup HTTP server callbacks
+
+    // setup HTTP server
     server.on ( "/", []() 
     { 
         String ssid = server.arg("ssid");
@@ -164,8 +176,12 @@ String IPAddress2String(const IPAddress & addr)
     }
     return ip;
 }
-            
+
 int oldStatus = WL_DISCONNECTED;
+int  ts = 0;
+int  nextNTPts = 0;
+long lastepoch = 0;
+long lastmilli = 0;
 void loop() 
 {
     int status = WiFi.status(); 
@@ -183,7 +199,10 @@ void loop()
             String ip(IPAddress2String(addr));
             disp.print("STA:ok",ip.c_str());
             Serial.print ( "IP address: " );
-            Serial.println ( WiFi.localIP() );    
+            Serial.println ( WiFi.localIP() );   
+
+            Serial.println("Starting UDP");
+            ntp.begin(123);        
         }
         else if(status == WL_NO_SSID_AVAIL)
         {
@@ -206,4 +225,42 @@ void loop()
     }
         
     server.handleClient();
+
+    if (status == WL_CONNECTED)
+    {
+        // NTP request
+        if (millis()/1000 >= nextNTPts)
+        {
+              ntp.sendNTPpacket();
+              nextNTPts = millis()/1000 + 60;
+        }
+
+        // NTP answer
+        long epoch = ntp.parseNTPpacket();
+        if (epoch >=0)
+        {
+            lastepoch = epoch;
+            lastmilli = millis();            
+        }
+
+        if (millis()/1000 >= ts)
+        {
+              long epoch = lastepoch + (millis() - lastmilli)/1000;
+              int days = epoch / 86400;
+              int hours = (epoch % 86400) / 3600;
+              int minutes = ((epoch % 86400) % 3600) / 60;
+              int seconds = (((epoch % 86400) % 3600) % 60);
+    
+              String info("STA:ok ");
+              info += addDigits(hours);
+              info += ":";
+              info += addDigits(minutes);
+              info += ":";
+              info += addDigits(seconds);
+              
+              disp.print(info.c_str(),NULL);            
+          
+              ts = millis()/1000 + 1;
+        }    
+    }    
 }
