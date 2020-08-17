@@ -40,8 +40,9 @@ unsigned long ntpclient::sendNTPpacket()
     // all NTP fields have been given values, now
     // you can send a packet requesting a timestamp:
     udp.beginPacket(timeServer, 123); //NTP requests are to port 123
-    udp.write(packetBuffer, NTP_PACKET_SIZE);
+    size_t size = udp.write(packetBuffer, NTP_PACKET_SIZE);
     udp.endPacket();
+    return size;
 }
 
 long ntpclient::parseNTPpacket()
