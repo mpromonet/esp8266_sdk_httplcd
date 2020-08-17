@@ -19,7 +19,7 @@ class mcp23008
     public:
         mcp23008();
       
-        int begin(uint8_t address, uint8_t sda, uint8_t scl);    
+        void begin(uint8_t address, uint8_t sda, uint8_t scl);    
         int detect();
         
         uint8_t read(uint8_t reg);

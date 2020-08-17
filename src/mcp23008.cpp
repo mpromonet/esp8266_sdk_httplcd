@@ -15,7 +15,7 @@ mcp23008::mcp23008() : m_address(0)
 {
 }
     
-int mcp23008::begin(uint8_t address, uint8_t sda, uint8_t scl)
+void mcp23008::begin(uint8_t address, uint8_t sda, uint8_t scl)
 {
     Wire.begin(sda,scl);  
     m_address = MCP23008_ADDRESS | address;

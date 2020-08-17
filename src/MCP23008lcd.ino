@@ -63,14 +63,14 @@ int initStaFromEEPROM()
 {
     int ret = 0;
     char head[sizeof(magic)];
-    for (int i=0; i<sizeof(magic) ; ++i)
+    for (unsigned int i=0; i<sizeof(magic) ; ++i)
     {
         head[i] = EEPROM.read(i);
     }
     if (memcmp(head, magic, sizeof(magic)) != 0)
     {
         Serial.println("\nInit EEPROM");
-        int i=0;
+        unsigned int i=0;
         for (i = 0; i < sizeof(magic); i++)
             EEPROM.write(i, magic[i]);  
         for (; i < 512; i++)
@@ -122,11 +122,11 @@ void setup()
         String password = server.arg("password");
         if ( (ssid.length() > 0) && (password.length() > 0) )
         {
-            for (int i=0; i<ssid.length() ; ++i)
+            for (unsigned int i=0; i<ssid.length() ; ++i)
             {
               EEPROM.write(i+offsetSSID,ssid[i]);
             }
-            for (int i=0; i<password.length() ; ++i)
+            for (unsigned int i=0; i<password.length() ; ++i)
             {
               EEPROM.write(i+offsetPassword,password[i]);
             }
@@ -178,8 +178,8 @@ String IPAddress2String(const IPAddress & addr)
 }
 
 int oldStatus = WL_DISCONNECTED;
-int  ts = 0;
-int  nextNTPts = 0;
+unsigned int  ts = 0;
+unsigned int  nextNTPts = 0;
 long lastepoch = 0;
 long lastmilli = 0;
 void loop() 
@@ -246,7 +246,6 @@ void loop()
         if (millis()/1000 >= ts)
         {
               long epoch = lastepoch + (millis() - lastmilli)/1000;
-              int days = epoch / 86400;
               int hours = (epoch % 86400) / 3600;
               int minutes = ((epoch % 86400) % 3600) / 60;
               int seconds = (((epoch % 86400) % 3600) % 60);

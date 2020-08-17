@@ -66,11 +66,11 @@ void lcd::write_string(uint8_t line,const char* message)
 	Serial.println(message);
 	write_byte(line,false);
 	int max = (strlen(message)<LCD_WIDTH) ? strlen(message) : LCD_WIDTH;      
-	for (int i = 0; i<strlen(message); ++i)
+	for (int i = 0; i<max; ++i)
 	{
 		write_byte(message[i],true);
 	}
-	for (int i = strlen(message); i<LCD_WIDTH; ++i)
+	for (int i = max; i<LCD_WIDTH; ++i)
 	{
 		write_byte(' ',true);
 	}
